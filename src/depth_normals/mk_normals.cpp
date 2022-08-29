@@ -232,7 +232,6 @@ void NormalizeImage::pprintImage(std::string PATH, std::string MODE){
         std::cout<< " this option is not available!"<<std::endl;
         throw;
     }
-
 }
 }
 

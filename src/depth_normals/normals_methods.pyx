@@ -20,7 +20,7 @@ cdef class NORMALIZE_IMAGE:
         else:
              self.thisptr = new NormalizeImage()
              if (imageArrays is not None): #(imageArrays.size!=0):
-                self.loadImageArray(imageArrays, MODE)
+                self.loadImageArray(imageArrays, MODE, "./normalized_images/")
 
     def __dealloc__(self):
         del self.thisptr
@@ -28,9 +28,9 @@ cdef class NORMALIZE_IMAGE:
     @boundscheck(False)
     @wraparound(False)
     @staticmethod
-    cdef NORMALIZE_IMAGE from_array(string MODE, ndarray imageArrays):
+    cdef NORMALIZE_IMAGE from_array(string MODE, ndarray imageArrays, string output="./normalized_images/"):
         cdef NORMALIZE_IMAGE wrapper = NORMALIZE_IMAGE.__new__(NORMALIZE_IMAGE) # , MODE, b"", imageArrays)
-        wrapper.loadImageArray(imageArrays, MODE)
+        wrapper.loadImageArray(imageArrays, MODE, output)
         return wrapper
 
     @boundscheck(False)
@@ -81,18 +81,23 @@ cdef class NORMALIZE_IMAGE:
 
     @boundscheck(False)
     @wraparound(False)
-    cdef vector[Mat] loadNumpyArray(self, string MODE="conv", ndarray imageArrays=None):
+    cdef inline void writer(self, string PATH, string MODE):
+        self.thisptr.pprintImage(PATH, MODE)
+
+    @boundscheck(False)
+    @wraparound(False)
+    cdef vector[Mat] loadNumpyArray(self, string MODE="conv", string output="./normalized_images/", ndarray imageArrays=None):
 
         cdef:
             vector[Mat] images
 
-        cdef NORMALIZE_IMAGE wrapper = NORMALIZE_IMAGE.from_array(MODE, imageArrays)
+        cdef NORMALIZE_IMAGE wrapper = NORMALIZE_IMAGE.from_array(MODE, imageArrays, output)
         images = wrapper.getImages()
         return images
 
     @boundscheck(False)
     @wraparound(False)
-    cdef void loadImageArray(self, ndarray imageArrays, string MODE):
+    cdef void loadImageArray(self, ndarray imageArrays, string MODE, string output="./normalized_images/"):
 
         cdef:
             int i, length
@@ -111,8 +116,9 @@ cdef class NORMALIZE_IMAGE:
                     self.crossMethod()
                 elif(MODE=="crossfast"):
                     self.crossfastMethod()
-                # print("load array -> ", i, self.getNormalizedImage().cols, self.getNormalizedImage().rows)
                 self.normalizedImages.push_back(self.getNormalizedImage())
+                if(output!=""):
+                    self.writer(output + b"_" + str(i).encode("utf-8"), MODE)
 
     @boundscheck(False)
     @wraparound(False)
@@ -196,7 +202,10 @@ cdef class NORMALIZE_IMAGE:
     def pyNormalizedImage(self):
         return self.pyNormals(self.getImages())
 
-    def loadNumPyArray(self, MODE, array):
-        return self.pyNormals(self.loadNumpyArray(MODE, array))
+    def loadNumPyArray(self, MODE, output, array):
+        if(output is None):
+            return self.pyNormals(self.loadNumpyArray(MODE, "", array))
+        else:
+            return self.pyNormals(self.loadNumpyArray(MODE, output, array))
 
 
