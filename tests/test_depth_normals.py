@@ -29,7 +29,6 @@ def test_depth_normals(mode, path):
     normal = NORMALIZE_IMAGE()
     normals = normal.loadNumPyArray(mode, b"./normalized_images/", arrays)
     print("Normals ->", normals.shape)
-    #pyNormals = normal.from_array("conv", array)
 
 if (__name__ == "__main__"):
     arrays = directories()
