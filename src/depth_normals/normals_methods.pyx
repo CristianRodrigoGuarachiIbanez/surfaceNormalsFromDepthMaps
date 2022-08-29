@@ -8,7 +8,6 @@ from numpy import asarray, dstack, uint8, float32, zeros, ascontiguousarray, any
 from numpy cimport ndarray, uint8_t
 
 
-
 cdef class NORMALIZE_IMAGE:
     cdef:
          NormalizeImage * thisptr

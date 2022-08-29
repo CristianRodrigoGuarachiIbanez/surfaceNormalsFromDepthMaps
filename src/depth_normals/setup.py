@@ -26,7 +26,7 @@ print("LIBS", cvlibs, os.path.join("usr", "include", "opencv2"))
 print("FOLDER:", lib_folder, sys.prefix)
 setup(
     cmdclass={'build_ext': build_ext},
-    ext_modules=cythonize(Extension("normals",
+    ext_modules=cythonize(Extension("NormalizationMethods",
                                     sources=["normals_methods.pyx", "mk_normals.cpp"],
                                     language="c++",
                                     include_dirs=[np.get_include(),
